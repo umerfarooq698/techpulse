@@ -14,6 +14,7 @@ function getDatabaseUrl(): string {
         if (fs.existsSync(src)) {
           try {
             fs.copyFileSync(src, tmpDbPath);
+            fs.chmodSync(tmpDbPath, 0o666);
             break;
           } catch (e) {
             console.warn('Failed to copy SQLite database to /tmp:', e);

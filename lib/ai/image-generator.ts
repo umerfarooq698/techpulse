@@ -21,26 +21,24 @@ export async function generateArticleImages(
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
+  const featuredFilename = `${slugifiedKeyword}-featured.svg`;
+  const featuredSvg = createTechSVGGraphic(keyword, categoryName, 'Featured');
 
-  // 1. Featured Image Generation
-  const featuredPrompt = `Editorial tech cover visual for ${keyword} in ${categoryName} category. Clean minimalist tech aesthetic, 16:9 ratio, no text.`;
-  const featuredResult = await provider.generateImage(featuredPrompt, { aspectRatio: '16:9' });
-
-  const featuredFilename = `${slugifiedKeyword}-featured.webp`;
-  const localFeaturedPath = path.join(uploadsDir, featuredFilename);
-
-  // Generate SVG/Canvas graphic placeholder for WebP image if remote file is local upload
-  if (!fs.existsSync(localFeaturedPath)) {
-    const svgGraphic = createTechSVGGraphic(keyword, categoryName, 'Featured');
-    fs.writeFileSync(localFeaturedPath, svgGraphic);
+  let featuredUrl = `/uploads/${featuredFilename}`;
+  try {
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    const localFeaturedPath = path.join(uploadsDir, featuredFilename);
+    fs.writeFileSync(localFeaturedPath, featuredSvg);
+  } catch (e) {
+    // Read-only filesystem fallback (Vercel Serverless)
+    featuredUrl = `data:image/svg+xml;utf8,${encodeURIComponent(featuredSvg)}`;
   }
 
   const featuredImage: GeneratedImageData = {
-    url: `/uploads/${featuredFilename}`,
+    url: featuredUrl,
     alt: `Comprehensive guide to ${keyword} in ${categoryName}`,
     caption: `TechPulse editorial coverage of ${keyword}.`,
     filename: featuredFilename,
@@ -50,17 +48,23 @@ export async function generateArticleImages(
   const supportingImages: GeneratedImageData[] = [];
   if (generateSupporting) {
     for (let i = 1; i <= 2; i++) {
-      const suppPrompt = `Technical diagram or visual aspect ${i} of ${keyword}. Vector aesthetic.`;
-      const suppFilename = `${slugifiedKeyword}-visual-${i}.webp`;
-      const localSuppPath = path.join(uploadsDir, suppFilename);
+      const suppFilename = `${slugifiedKeyword}-visual-${i}.svg`;
+      const suppSvg = createTechSVGGraphic(keyword, categoryName, `Technical Section ${i}`);
 
-      if (!fs.existsSync(localSuppPath)) {
-        const svgGraphic = createTechSVGGraphic(keyword, categoryName, `Technical Section ${i}`);
-        fs.writeFileSync(localSuppPath, svgGraphic);
+      let suppUrl = `/uploads/${suppFilename}`;
+      try {
+        const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const localSuppPath = path.join(uploadsDir, suppFilename);
+        fs.writeFileSync(localSuppPath, suppSvg);
+      } catch (e) {
+        suppUrl = `data:image/svg+xml;utf8,${encodeURIComponent(suppSvg)}`;
       }
 
       supportingImages.push({
-        url: `/uploads/${suppFilename}`,
+        url: suppUrl,
         alt: `${keyword} visual breakdown part ${i}`,
         caption: `Visual architecture diagram for ${keyword}.`,
         filename: suppFilename,
