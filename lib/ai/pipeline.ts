@@ -67,22 +67,43 @@ Return JSON with sections array.`;
 
     // STAGE 3: Article Draft Writer
     await updateJob('Stage 3: Generating Article Content Section by Section', 45);
-    const stage3Prompt = `Write a comprehensive, highly detailed technical and informational article specifically about: "${keyword}".
-Article Type: ${config.articleType || 'Informational'}
-Tone: ${config.tone || 'Professional & Authoritative'}
-Target Word Count: ${config.minWords || 1200} to ${config.maxWords || 2500} words.
-Format: Clean Markdown with H2, H3, bold text, technical code blocks or specs tables (where applicable), step-by-step instructions, and bullet points.
+    const stage3Prompt = `Write a comprehensive, top-tier, highly engaging article for the keyword: "${keyword}".
 
-CRITICAL CONTENT QUALITY & RELEVANCE RULES:
-1. Focus 100% specifically on "${keyword}". Every heading, paragraph, table, and FAQ MUST be directly relevant to "${keyword}".
-2. Structure the article with clear H2 sections:
-   - Overview & Technical Context of ${keyword}
-   - Key Features / Specifications / Architectural Breakdown of ${keyword}
-   - Real-World Performance & Benchmarks (include Markdown comparison/metrics table)
-   - Step-by-Step Practical Guide / Configuration / Setup Steps for ${keyword}
-   - Troubleshooting Common Issues for ${keyword}
-   - Frequently Asked Questions (H2 FAQ section with H3 questions)
-3. NEVER use cliché AI filler phrases like "In today's digital world", "In this comprehensive guide", "Whether you're a beginner or expert". Write directly with authority and specific technical details.`;
+TARGET PRODUCT & DOMAIN CONTEXT:
+- If "${keyword}" refers to consumer audio or hardware (e.g. Airbuds, Earbuds, Headphones, AirPods, Smartphones, Laptops, GPUs, Gadgets), write an authoritative, in-depth review & buyer setup guide covering sound quality, Active Noise Cancellation (ANC), technical specifications, real-world battery benchmarks, pairing/configuration steps, troubleshooting, and FAQs.
+- If "${keyword}" refers to software, coding, cloud, or cybersecurity, write a comprehensive step-by-step technical guide with code snippets, architecture breakdown, setup commands, performance metrics, and FAQs.
+
+REQUIRED STRUCTURE (MUST USE CLEAR MARKDOWN HEADINGS & TABLES):
+## Overview & Technical Context
+Write a compelling intro explaining what ${keyword} is, its key positioning, and target audience.
+
+## Key Features & Complete Specifications
+Include a structured Markdown table comparing key specs and performance telemetry:
+| Feature / Specification | Details & Benchmark Metrics |
+| :--- | :--- |
+
+## Real-World Performance & Testing Metrics
+Detail hands-on performance, benchmarks, battery endurance, or execution efficiency.
+
+## Step-by-Step Practical Setup & Configuration Guide
+### Step 1: Initial Unboxing & Bluetooth Pairing / Setup
+### Step 2: Settings Optimization & Feature Customization
+
+## Troubleshooting Common Issues
+### Issue 1: Common Problem & Detailed Resolution
+
+## Frequently Asked Questions (FAQs)
+### What are the main features of ${keyword}?
+Provide a direct, detailed answer.
+### How does ${keyword} compare to previous generations?
+Provide a direct, detailed answer.
+### How to troubleshoot setup or connectivity issues?
+Provide a direct, detailed answer.
+
+CRITICAL CONTENT QUALITY RULES:
+1. Every paragraph and section MUST be 100% specifically relevant to "${keyword}".
+2. Use Markdown tables, bold highlights, bullet lists, and clear H2 and H3 headings.
+3. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide".`;
 
     const stage3Res = await provider.generateText(stage3Prompt);
     let rawContent = stage3Res.text;

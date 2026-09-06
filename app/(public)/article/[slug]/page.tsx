@@ -184,16 +184,134 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   );
 }
 
-// Simple Markdown parser for clean editorial presentation
+// Full Markdown parser for clean editorial presentation
 function formatMarkdownToHTML(markdown: string): string {
-  let html = markdown
-    .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-extrabold text-slate-900 mt-8 mb-4 border-b pb-2">$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-extrabold text-slate-900 mb-6">$1</h1>')
+  const lines = markdown.split('\n');
+  const html: string[] = [];
+  let inTable = false;
+  let tableHeaderDone = false;
+  let inUl = false;
+  let inOl = false;
+  let inCode = false;
+
+  for (let line of lines) {
+    const trimmed = line.trim();
+
+    // Code blocks
+    if (trimmed.startsWith('```')) {
+      if (inCode) {
+        html.push('</code></pre>');
+        inCode = false;
+      } else {
+        html.push('<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs overflow-x-auto my-4"><code>');
+        inCode = true;
+      }
+      continue;
+    }
+    if (inCode) {
+      html.push(line + '\n');
+      continue;
+    }
+
+    // Close lists if non-list line
+    if (inUl && !trimmed.startsWith('* ') && !trimmed.startsWith('- ')) {
+      html.push('</ul>');
+      inUl = false;
+    }
+    if (inOl && !/^\d+\.\s/.test(trimmed)) {
+      html.push('</ol>');
+      inOl = false;
+    }
+
+    // Tables
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const cells = trimmed.split('|').slice(1, -1).map((c) => c.trim());
+      if (!inTable) {
+        html.push('<div class="overflow-x-auto my-6"><table class="min-w-full divide-y divide-slate-200 border border-slate-200 rounded-xl overflow-hidden text-sm">');
+        html.push('<thead class="bg-slate-100 font-bold text-slate-900"><tr>');
+        cells.forEach((c) => html.push('<th class="px-4 py-2.5 text-left border-b border-slate-200">' + formatInline(c) + '</th>'));
+        html.push('</tr></thead><tbody class="divide-y divide-slate-100 bg-white">');
+        inTable = true;
+        tableHeaderDone = false;
+        continue;
+      } else if (!tableHeaderDone && cells.every((c) => /^:?-+:?$/.test(c))) {
+        tableHeaderDone = true;
+        continue;
+      } else {
+        html.push('<tr>');
+        cells.forEach((c) => html.push('<td class="px-4 py-2.5 text-slate-700">' + formatInline(c) + '</td>'));
+        html.push('</tr>');
+        continue;
+      }
+    } else if (inTable) {
+      html.push('</tbody></table></div>');
+      inTable = false;
+    }
+
+    // Headings
+    if (trimmed.startsWith('### ')) {
+      html.push('<h3 class="text-xl font-extrabold text-slate-900 mt-8 mb-3">' + formatInline(trimmed.slice(4)) + '</h3>');
+      continue;
+    }
+    if (trimmed.startsWith('## ')) {
+      html.push('<h2 class="text-2xl font-extrabold text-slate-900 mt-10 mb-4 border-b border-slate-200 pb-2">' + formatInline(trimmed.slice(3)) + '</h2>');
+      continue;
+    }
+    if (trimmed.startsWith('# ')) {
+      html.push('<h1 class="text-3xl font-extrabold text-slate-900 mt-6 mb-4">' + formatInline(trimmed.slice(2)) + '</h1>');
+      continue;
+    }
+
+    // Unordered lists
+    if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+      if (!inUl) {
+        html.push('<ul class="space-y-1.5 my-4 pl-5 list-disc text-slate-700">');
+        inUl = true;
+      }
+      html.push('<li>' + formatInline(trimmed.slice(2)) + '</li>');
+      continue;
+    }
+
+    // Ordered lists
+    if (/^\d+\.\s/.test(trimmed)) {
+      const content = trimmed.replace(/^\d+\.\s/, '');
+      if (!inOl) {
+        html.push('<ol class="space-y-1.5 my-4 pl-5 list-decimal text-slate-700">');
+        inOl = true;
+      }
+      html.push('<li>' + formatInline(content) + '</li>');
+      continue;
+    }
+
+    // Horizontal Rule
+    if (trimmed === '---' || trimmed === '***') {
+      html.push('<hr class="my-8 border-slate-200" />');
+      continue;
+    }
+
+    // Blockquote
+    if (trimmed.startsWith('> ')) {
+      html.push('<blockquote class="border-l-4 border-sky-500 bg-sky-50 p-4 rounded-r-xl my-4 text-slate-700 italic">' + formatInline(trimmed.slice(2)) + '</blockquote>');
+      continue;
+    }
+
+    // Paragraph
+    if (trimmed.length > 0) {
+      html.push('<p class="my-4 text-slate-700 leading-relaxed font-normal">' + formatInline(trimmed) + '</p>');
+    }
+  }
+
+  if (inTable) html.push('</tbody></table></div>');
+  if (inUl) html.push('</ul>');
+  if (inOl) html.push('</ol>');
+  if (inCode) html.push('</code></pre>');
+
+  return html.join('\n');
+}
+
+function formatInline(text: string): string {
+  return text
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>')
     .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-    .replace(/```([\s\S]*?)```/g, '<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs overflow-x-auto my-4"><code>$1</code></pre>')
-    .replace(/\n\n/g, '</p><p class="my-4 text-slate-700 leading-relaxed">');
-
-  return `<p className="my-4 text-slate-700 leading-relaxed">${html}</p>`;
+    .replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-xs">$1</code>');
 }
