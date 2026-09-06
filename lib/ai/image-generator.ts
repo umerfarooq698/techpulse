@@ -7,7 +7,23 @@ export interface GeneratedImageData {
   filename: string;
 }
 
-const TECH_PHOTO_COLLECTION: Record<string, string[]> = {
+const TOPIC_PHOTO_COLLECTION: Record<string, string[]> = {
+  samsung: [
+    'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=1200&auto=format&fit=crop&q=80',
+  ],
+  iphone: [
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=1200&auto=format&fit=crop&q=80',
+  ],
+  smartphones: [
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=1200&auto=format&fit=crop&q=80',
+  ],
   ai: [
     'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&auto=format&fit=crop&q=80',
@@ -22,11 +38,6 @@ const TECH_PHOTO_COLLECTION: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&auto=format&fit=crop&q=80',
-  ],
-  smartphones: [
-    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=1200&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=1200&auto=format&fit=crop&q=80',
   ],
   laptops: [
     'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1200&auto=format&fit=crop&q=80',
@@ -56,16 +67,32 @@ export async function generateArticleImages(
   categoryName: string,
   generateSupporting: boolean = true
 ): Promise<{ featuredImage: GeneratedImageData; supportingImages: GeneratedImageData[] }> {
+  const kwLower = keyword.toLowerCase();
   const catKey = categoryName.toLowerCase().replace(/[^a-z]+/g, '');
-  const photos = TECH_PHOTO_COLLECTION[catKey] || TECH_PHOTO_COLLECTION['default'];
 
-  // Hash keyword to deterministically select high-quality photography
+  let photoBucket = TOPIC_PHOTO_COLLECTION['default'];
+
+  if (kwLower.includes('samsung') || kwLower.includes('galaxy')) {
+    photoBucket = TOPIC_PHOTO_COLLECTION['samsung'];
+  } else if (kwLower.includes('iphone') || kwLower.includes('apple') || kwLower.includes('ios')) {
+    photoBucket = TOPIC_PHOTO_COLLECTION['iphone'];
+  } else if (kwLower.includes('phone') || kwLower.includes('mobile') || kwLower.includes('pixel') || kwLower.includes('ultra')) {
+    photoBucket = TOPIC_PHOTO_COLLECTION['smartphones'];
+  } else if (kwLower.includes('ai') || kwLower.includes('gpt') || kwLower.includes('gemini') || kwLower.includes('llm')) {
+    photoBucket = TOPIC_PHOTO_COLLECTION['ai'];
+  } else if (kwLower.includes('security') || kwLower.includes('linux') || kwLower.includes('cyber')) {
+    photoBucket = TOPIC_PHOTO_COLLECTION['cybersecurity'];
+  } else if (TOPIC_PHOTO_COLLECTION[catKey]) {
+    photoBucket = TOPIC_PHOTO_COLLECTION[catKey];
+  }
+
+  // Hash keyword to deterministically select unique high-quality photography per keyword
   let hash = 0;
   for (let i = 0; i < keyword.length; i++) {
     hash = keyword.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const index = Math.abs(hash) % photos.length;
-  const featuredUrl = photos[index];
+  const index = Math.abs(hash) % photoBucket.length;
+  const featuredUrl = photoBucket[index];
 
   const slugifiedKeyword = keyword
     .toLowerCase()
@@ -74,7 +101,7 @@ export async function generateArticleImages(
 
   const featuredImage: GeneratedImageData = {
     url: featuredUrl,
-    alt: `Comprehensive guide to ${keyword} in ${categoryName}`,
+    alt: `Technical review and analysis of ${keyword}`,
     caption: `TechPulse editorial coverage of ${keyword}.`,
     filename: `${slugifiedKeyword}-featured.jpg`,
   };
@@ -82,10 +109,10 @@ export async function generateArticleImages(
   const supportingImages: GeneratedImageData[] = [];
   if (generateSupporting) {
     for (let i = 1; i <= 2; i++) {
-      const suppUrl = photos[(index + i) % photos.length];
+      const suppUrl = photoBucket[(index + i) % photoBucket.length];
       supportingImages.push({
         url: suppUrl,
-        alt: `${keyword} visual breakdown part ${i}`,
+        alt: `${keyword} technical breakdown visual ${i}`,
         caption: `Visual technical breakdown for ${keyword}.`,
         filename: `${slugifiedKeyword}-visual-${i}.jpg`,
       });
@@ -94,3 +121,4 @@ export async function generateArticleImages(
 
   return { featuredImage, supportingImages };
 }
+

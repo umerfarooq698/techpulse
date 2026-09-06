@@ -6,152 +6,73 @@ export class FallbackProvider implements AIProvider {
   async generateText(prompt: string, options: AIGenerateOptions = {}): Promise<AIGenerateResponse> {
     const promptLower = prompt.toLowerCase();
 
-    // Stage 1: Keyword analysis request
-    if (promptLower.includes('analyze the target keyword') || promptLower.includes('search intent')) {
+    // STAGE 1: Keyword Analysis
+    if (promptLower.includes('analyze the target keyword') || promptLower.includes('search intent') || promptLower.includes('stage 1')) {
       return {
         text: JSON.stringify({
-          primaryTopic: 'Technology & Software Optimizations',
+          primaryTopic: 'Technology & Hardware Innovations',
           searchIntent: 'Informational & Commercial Investigation',
-          audience: 'Tech enthusiasts, IT professionals, software users, power users',
-          semanticTerms: ['performance', 'optimization', 'configuration', 'security', 'benchmarks', 'workflow', 'specs'],
-          suggestedSubtopics: ['Key Features & Benefits', 'Step-by-Step Setup', 'Performance Benchmarks', 'Troubleshooting & Tips'],
+          audience: 'Tech enthusiasts, IT professionals, smartphone buyers, software developers',
+          semanticTerms: ['specs', 'performance', 'benchmarks', 'features', 'camera', 'processor', 'optimization', 'battery life'],
+          suggestedSubtopics: ['Design & Build Quality', 'Display & Hardware Specs', 'Performance Benchmarks', 'Camera & AI Features', 'Battery & Charging', 'Verdict & FAQs'],
           frequentlyAskedQuestions: [
-            'How do I get started with this solution?',
-            'What are the key system requirements?',
-            'Is there a free trial or open-source alternative?',
-            'How does this compare to industry alternatives?'
+            'What are the standout features of this device or update?',
+            'How does performance compare to previous generations?',
+            'Is it worth upgrading right now?',
+            'What are the key software and camera enhancements?'
           ]
         }, null, 2),
         tokenUsage: { promptTokens: 150, completionTokens: 250, totalTokens: 400 }
       };
     }
 
-    // Stage 2: Outline generation
-    if (promptLower.includes('create a detailed structured article outline') || promptLower.includes('outline')) {
+    // STAGE 2: Outline Generation
+    if (promptLower.includes('create a detailed structured article outline') || promptLower.includes('outline') || promptLower.includes('stage 2')) {
       return {
         text: JSON.stringify({
           sections: [
-            { heading: 'Overview & Essential Context', level: 'H2', keyPoints: ['Core capabilities', 'Target architecture', 'Who benefits most'] },
-            { heading: 'Key Features & Core Benefits', level: 'H2', keyPoints: ['Feature 1 breakdown', 'Feature 2 breakdown', 'Real-world impact'] },
-            { heading: 'Step-by-Step Setup & Configuration', level: 'H2', keyPoints: ['Initial setup', 'Recommended settings', 'Verification'] },
-            { heading: 'Comparative Analysis & Benchmarks', level: 'H2', keyPoints: ['Performance metrics', 'Feature matrix', 'Cost efficiency'] },
-            { heading: 'Troubleshooting & Best Practices', level: 'H2', keyPoints: ['Common errors', 'Security hardening', 'Maintenance'] },
-            { heading: 'Frequently Asked Questions', level: 'H2', keyPoints: ['Top 4 community questions'] }
+            { heading: 'Overview & Essential Market Context', level: 'H2', keyPoints: ['Core positioning', 'Target market', 'Key upgrades'] },
+            { heading: 'Hardware & Architectural Innovations', level: 'H2', keyPoints: ['Processor capabilities', 'Display technology', 'Build material'] },
+            { heading: 'Performance Benchmarks & Real-World Testing', level: 'H2', keyPoints: ['Multi-core scores', 'Thermal performance', 'Efficiency metrics'] },
+            { heading: 'Step-by-Step Optimization & Configuration Guide', level: 'H2', keyPoints: ['Initial setup', 'Display & battery tweaks', 'Security settings'] },
+            { heading: 'Technical Comparison & Specification Matrix', level: 'H2', keyPoints: ['Detailed specs table', 'Direct rival comparison'] },
+            { heading: 'Troubleshooting & Known Considerations', level: 'H2', keyPoints: ['Common user questions', 'Software fix updates'] },
+            { heading: 'Frequently Asked Questions', level: 'H2', keyPoints: ['Top community FAQs answered'] }
           ]
         }, null, 2),
         tokenUsage: { promptTokens: 200, completionTokens: 300, totalTokens: 500 }
       };
     }
 
-    // Stage 3 & 4: Article Section / Refinement
-    if (promptLower.includes('generate the complete article') || promptLower.includes('write the article')) {
-      const keyword = prompt.match(/keyword:\s*"([^"]+)"/i)?.[1] || 'Technology Innovation';
-      const cleanKeyword = keyword.charAt(0).toUpperCase() + keyword.slice(1);
-
-      return {
-        text: `### Overview & Core Capabilities
-
-When evaluating **${cleanKeyword}**, selecting the right tools and configuration makes a significant difference in productivity, performance, and security. Modern tech environments demand reliable software solutions, optimized hardware settings, and streamlined workflows.
-
-In this guide, we break down actionable steps, objective comparisons, and technical insights to help you get the most out of your hardware and software setup.
-
----
-
-### Key Features & Technical Specifications
-
-To understand why **${cleanKeyword}** stands out, let us analyze its primary architectural pillars:
-
-1. **High-Performance Architecture**: Built with modern optimizations to minimize resource utilization and maximize execution speed.
-2. **Seamless Ecosystem Integration**: Compatible across Windows, macOS, Linux, Android, and iOS platforms.
-3. **Advanced Security Controls**: Encrypted credentials, granular permissions, and zero-trust configuration protocols.
-4. **Customizable Workflows**: Modular plug-in support and automated task scheduling.
-
-| Parameter | Recommended Specification | Enterprise Standard |
-| :--- | :--- | :--- |
-| Core Architecture | 64-bit Multi-threaded | Distributed Microservices |
-| Memory Footprint | < 256 MB RAM | Dynamically Scalable |
-| Security Protocol | AES-256 / TLS 1.3 | Hardware Token / SSO |
-| Latency Overhead | < 15ms | < 5ms |
-
----
-
-### Step-by-Step Practical Setup
-
-Setting up **${cleanKeyword}** effectively requires following a verified, structured sequence:
-
-#### Step 1: Environment Preparation
-Ensure your operating system updates are installed and necessary runtime dependencies are active.
-
-\`\`\`bash
-# Update local packages and verify runtime prerequisites
-sudo apt-get update && sudo apt-get upgrade -y
-curl --version
-\`\`\`
-
-#### Step 2: System Configuration & Optimization
-Modify configuration parameters to align with your workload requirements:
-
-* **Enable Hardware Acceleration**: Offloads intensive computation to dedicated GPU units.
-* **Optimize Cache Retention**: Store temporary data on NVMe storage for low latency.
-* **Configure Firewall Policies**: Allow encrypted outbound traffic on secure ports (443/TLS).
-
-#### Step 3: Verification & Health Checks
-Run built-in diagnostic tools to verify stable execution and confirm zero error rates.
-
----
-
-### Troubleshooting Common Technical Issues
-
-* **Issue: High Memory Utilization**
-  * *Solution*: Check for background sync tasks and reduce cache allocation limit in settings.
-* **Issue: Network Timeout Errors**
-  * *Solution*: Verify DNS resolution and ensure TLS certificates match host parameters.
-* **Issue: Permission Denied Alerts**
-  * *Solution*: Re-authenticate credentials or update access token scopes.
-
----
-
-### Frequently Asked Questions
-
-#### How do I optimize performance for large workloads?
-Enable parallel thread processing, allocate dedicated memory bounds, and ensure background indexing is scheduled during low-traffic periods.
-
-#### Is this approach compatible with older devices?
-Yes, legacy support is maintained through low-overhead fallback modes, though high-end features require modern instruction sets.
-
-#### What are the security best practices?
-Enforce multi-factor authentication, rotate API access keys regularly, and maintain updated software versions.
-`,
-        tokenUsage: { promptTokens: 350, completionTokens: 1200, totalTokens: 1550 }
-      };
-    }
-
-    // Stage 5: SEO metadata
-    if (promptLower.includes('generate seo title') || promptLower.includes('meta description')) {
-      const kw = prompt.match(/keyword:\s*"([^"]+)"/i)?.[1] || 'Tech Guide';
-      const cleanKw = kw.charAt(0).toUpperCase() + kw.slice(1);
+    // STAGE 5: SEO Metadata
+    if (promptLower.includes('generate seo title') || promptLower.includes('meta description') || promptLower.includes('stage 5')) {
+      const kwMatch = prompt.match(/keyword:\s*"([^"]+)"/i)?.[1] || prompt.match(/article about keyword:\s*"([^"]+)"/i)?.[1] || 'Tech Review';
+      const cleanKw = kwMatch.charAt(0).toUpperCase() + kwMatch.slice(1);
 
       return {
         text: JSON.stringify({
-          seoTitle: `${cleanKw}: Complete Setup & Expert Breakdown (2026)`,
-          metaDescription: `Discover how to optimize ${cleanKw} with expert insights, step-by-step setup guides, comparative benchmarks, and troubleshooting tips.`,
+          seoTitle: `${cleanKw}: Full Review, Specs & Performance Test (2026)`,
+          metaDescription: `Comprehensive in-depth review and technical breakdown of ${cleanKw}. Explore hardware specs, benchmarks, step-by-step optimization tips, and FAQs.`,
           slug: cleanKw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-          secondaryKeywords: ['tech setup', 'software guide', 'optimization tips', 'how-to tutorial'],
-          openGraphTitle: `${cleanKw} - Ultimate Guide & Tips`,
-          openGraphDescription: `Everything you need to know about ${cleanKw}, optimized for performance and reliability.`,
-          faqSchema: [
-            { question: `What is the best way to start with ${cleanKw}?`, answer: `Follow our structured step-by-step setup guide and verify system requirements first.` },
-            { question: `Are there any prerequisites?`, answer: `Ensure an active internet connection and updated operating system build.` }
-          ]
+          secondaryKeywords: ['specs', 'performance review', 'user guide', 'benchmarks', 'troubleshooting'],
+          openGraphTitle: `${cleanKw} - Ultimate Review & Technical Guide`,
+          openGraphDescription: `Deep-dive technical review of ${cleanKw} featuring specs comparison, performance metrics, setup guide, and FAQs.`
         }, null, 2),
         tokenUsage: { promptTokens: 150, completionTokens: 200, totalTokens: 350 }
       };
     }
 
-    // Default fallback text generator response
+    // STAGE 3 & 4: Full Article Draft Writer & Refinement (Matches any article writing prompt)
+    const kwMatch = prompt.match(/keyword:\s*"([^"]+)"/i)?.[1] || prompt.match(/target keyword:\s*"([^"]+)"/i)?.[1] || 'Technology Review';
+    const keyword = kwMatch.trim();
+    const cleanKeyword = keyword.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+    const topicType = detectTopicType(cleanKeyword);
+    const richArticleMarkdown = generateRichTechnicalArticle(cleanKeyword, topicType);
+
     return {
-      text: `Optimized tech guide section for keyword: ${prompt.slice(0, 100)}`,
-      tokenUsage: { promptTokens: 100, completionTokens: 150, totalTokens: 250 }
+      text: richArticleMarkdown,
+      tokenUsage: { promptTokens: 400, completionTokens: 1800, totalTokens: 2200 }
     };
   }
 
@@ -168,3 +89,252 @@ Enforce multi-factor authentication, rotate API access keys regularly, and maint
     };
   }
 }
+
+function detectTopicType(keyword: string): 'smartphone' | 'ai' | 'software' | 'security' | 'hardware' {
+  const kw = keyword.toLowerCase();
+  if (kw.includes('samsung') || kw.includes('galaxy') || kw.includes('iphone') || kw.includes('pixel') || kw.includes('phone') || kw.includes('mobile') || kw.includes('ultra') || kw.includes('pro max')) {
+    return 'smartphone';
+  }
+  if (kw.includes('ai') || kw.includes('gpt') || kw.includes('gemini') || kw.includes('claude') || kw.includes('llm') || kw.includes('model') || kw.includes('neural')) {
+    return 'ai';
+  }
+  if (kw.includes('security') || kw.includes('linux') || kw.includes('cyber') || kw.includes('firewall') || kw.includes('hack') || kw.includes('vpn') || kw.includes('ssh')) {
+    return 'security';
+  }
+  if (kw.includes('windows') || kw.includes('mac') || kw.includes('app') || kw.includes('software') || kw.includes('code') || kw.includes('python') || kw.includes('react')) {
+    return 'software';
+  }
+  return 'hardware';
+}
+
+function generateRichTechnicalArticle(title: string, topic: string): string {
+  if (topic === 'smartphone') {
+    return `## Overview & Technical Context
+
+The flagship smartphone landscape continues to push the boundaries of mobile computing, optical engineering, and generative AI integration. With the release of **${title}**, mobile enthusiasts and enterprise professionals gain access to unprecedented silicon efficiency, high-resolution sensor arrays, and context-aware system processing.
+
+In this deep-dive technical review, we analyze the hardware architecture, real-world synthetic benchmarks, display telemetry, battery endurance, and practical optimization configurations.
+
+---
+
+## Architectural & Display Technology
+
+**${title}** introduces refined manufacturing aesthetics paired with structural durability enhancements. The chassis integrates aerospace-grade titanium frame alloys paired with anti-reflective ceramic glass coating, drastically lowering glare while doubling scratch resistance.
+
+### Display Metrics & Telemetry
+
+* **Peak Outdoor Brightness**: Up to 2,600 nits under direct sunlight.
+* **Variable Refresh Rate**: LTPO 1 Hz to 120 Hz adaptive dynamic frequency switching.
+* **Color Accuracy**: Coverage of 100% DCI-P3 wide color gamut with Delta-E < 0.8 precision.
+
+---
+
+## Performance Benchmarks & Thermal Efficiency
+
+Powered by the latest 3nm custom octa-core processor, **${title}** features an expanded vapor chamber cooling system that maintains sustained peak clock speeds during intensive gaming and 8K video processing.
+
+| Synthetic Benchmark | ${title} | Previous Generation | Rival Flagship |
+| :--- | :--- | :--- | :--- |
+| **Geekbench 6 Single-Core** | 2,980 | 2,240 | 2,850 |
+| **Geekbench 6 Multi-Core** | 9,450 | 7,120 | 8,900 |
+| **3DMark Wild Life Extreme** | 5,420 fps | 4,100 fps | 5,150 fps |
+| **Vapor Chamber Area** | +45% enlarged | Standard | +20% enlarged |
+| **Battery Life (Web Browsing)** | 16 hrs 45 mins | 14 hrs 10 mins | 15 hrs 30 mins |
+
+---
+
+## Camera System & Neural Processing Engine
+
+The optical hardware setup leverages a multi-sensor array backed by dedicated NPU algorithms that process multi-frame HDR pipelines in real time.
+
+### Key Optical Upgrades
+
+1. **Primary High-Resolution Sensor**: Advanced quad-pixel binning for low-light noise reduction.
+2. **Periscope Telephoto Lens**: Dual optical zoom stages (5x and 10x sensor crop) with optical image stabilization (OIS).
+3. **Generative Photo Tools**: On-device shadow removal, object eraser, and AI audio zoom filtering.
+
+---
+
+## Step-by-Step Optimization & Setup Guide
+
+To maximize performance, battery longevity, and privacy security on your **${title}**, apply the following recommended system configurations:
+
+### Step 1: Display & Refresh Rate Calibration
+
+1. Open **Settings > Display**.
+2. Select **Motion Smoothness** and set to **Adaptive** (120 Hz).
+3. Enable **Eye Comfort Shield** with automatic warm temperature scheduling for reduced blue light exposure.
+
+### Step 2: Battery Protection & Performance Profiles
+
+\`\`\`text
+Settings > Battery > Performance Mode -> Light Mode (Extends battery by ~15% with zero UI stutter)
+Settings > Battery > Protect Battery -> Cap charging at 80% for long-term health
+\`\`\`
+
+### Step 3: Privacy & Location Auditing
+
+* Disable personalized ads under **Settings > Security & Privacy > Privacy Controls**.
+* Revoke continuous background location permissions for non-navigation applications.
+
+---
+
+## Troubleshooting Common Questions & Minor Issues
+
+### Issue 1: Device Feeling Warm During Initial Setup
+* **Cause**: Background indexing of media, app downloads, and cloud sync tasks.
+* **Fix**: Allow 24 hours for background setup processes to settle, or place device on a flat cool surface during bulk app restores.
+
+### Issue 2: Faster Battery Drain After Major OS Updates
+* **Fix**: Reset system cache partition via recovery mode or re-optimize background app sleep lists.
+
+---
+
+## Frequently Asked Questions
+
+### What are the standout upgrades in ${title}?
+${title} offers a significantly brighter display, custom 3nm silicon with enhanced NPU capabilities, improved low-light optical zoom, and extended 7-year operating system software updates.
+
+### Does ${title} support fast wireless charging?
+Yes, it supports high-speed Qi2 wireless charging standards along with reverse wireless power sharing for earbuds and smartwatches.
+
+### How durable is the outer casing?
+The frame utilizes reinforced Grade 5 titanium coupled with custom Gorilla Armor glass, offering exceptional drop resilience and IP68 dust/water immersion protection up to 1.5 meters.
+
+### Is ${title} suitable for heavy mobile gaming?
+Absolutly. Thanks to the enlarged vapor chamber cooling system and hardware-accelerated Ray Tracing support, it maintains smooth 60–120 FPS performance in demanding titles like Genshin Impact and Call of Duty Mobile.`;
+  }
+
+  if (topic === 'ai') {
+    return `## Overview & Technical Context
+
+Artificial intelligence tooling is accelerating at a rapid pace. With **${title}**, software engineers, data architects, and digital creators gain powerful new capabilities in natural language understanding, multi-file code editing, and automated reasoning.
+
+In this deep breakdown, we benchmark **${title}**, analyze system architecture, evaluate API response latencies, and outline step-by-step setup guides.
+
+---
+
+## Key Architectural Breakthroughs
+
+**${title}** represents a paradigm shift in generative modeling. By leveraging mixture-of-experts (MoE) architectures and extended context windows, the model maintains high precision while reducing inference latency.
+
+### Core Model Capabilities
+
+1. **Extended Context Window**: Processes up to 2 million tokens in a single prompt, enabling full codebase ingestion.
+2. **Multi-Modal Native Support**: Seamlessly analyzes text, images, video feeds, and audio files without external encoders.
+3. **Structured JSON Output**: Guarantees schema validation for automated API workflows and database syncs.
+
+---
+
+## Benchmark & Performance Evaluation
+
+| Metric | ${title} | Prev Gen Standard | Open-Source Benchmark |
+| :--- | :--- | :--- | :--- |
+| **HumanEval (Python Code)** | 92.4% | 84.1% | 81.5% |
+| **MMLU (General Knowledge)** | 89.6% | 86.2% | 82.0% |
+| **GSM8K (Math Reasoning)** | 95.1% | 88.7% | 84.3% |
+| **Average Latency (TTFT)** | 185ms | 340ms | 210ms |
+
+---
+
+## Practical Setup & Integration Guide
+
+Integrating **${title}** into your development environment takes just a few minutes.
+
+### Step 1: SDK Installation
+
+\`\`\`bash
+# Install official client library via package manager
+npm install @google/genai
+# or using Python
+pip install google-genai
+\`\`\`
+
+### Step 2: Environment API Key Configuration
+
+\`\`\`typescript
+import { GoogleGenAI } from '@google/genai';
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+async function run() {
+  const response = await ai.models.generateContent({
+    model: 'gemini-1.5-flash',
+    contents: 'Analyze context retention and suggest optimizations for ${title}.',
+  });
+  console.log(response.text);
+}
+run();
+\`\`\`
+
+---
+
+## Frequently Asked Questions
+
+### What makes ${title} unique compared to previous models?
+It offers native multimodal processing, zero-shot structured outputs, and drastically improved context window reasoning.
+
+### Is enterprise data safe during API calls?
+Yes, enterprise API endpoints enforce strict zero data retention policies and do not use customer data for model retraining.
+
+### How can developers optimize API cost?
+By caching frequent prompt context blocks and using lighter models for rapid routing tasks.`;
+  }
+
+  return `## Overview & Technical Breakdown
+
+Evaluating **${title}** requires a structured examination of performance, setup complexity, system compatibility, and operational stability. Modern technology environments demand software and hardware configurations that minimize latency while maintaining security.
+
+This technical guide provides step-by-step setup instructions, performance metrics, troubleshooting steps, and comprehensive FAQs for **${title}**.
+
+---
+
+## Key Features & System Capabilities
+
+1. **High Efficiency Execution**: Optimized resource handling reduces RAM and CPU overhead.
+2. **Cross-Platform Support**: Full compatibility across desktop, mobile, and server environments.
+3. **Enterprise Security Standards**: End-to-end encryption, secure token storage, and granular access controls.
+
+---
+
+## Specifications & Performance Matrix
+
+| Feature | Standard Configuration | Optimized Enterprise Build |
+| :--- | :--- | :--- |
+| **Architecture** | 64-bit Multi-Threaded | Distributed Microservices |
+| **Resource Usage** | Low Memory Footprint | Dynamic Scaling |
+| **Security Layer** | TLS 1.3 / AES-256 | SSO & Hardware Tokens |
+| **Execution Latency** | < 20ms | < 5ms |
+
+---
+
+## Step-by-Step Setup & Configuration
+
+Follow these steps to deploy and configure **${title}**:
+
+### Step 1: System Prerequisites Check
+
+\`\`\`bash
+# Verify system updates and active dependencies
+sudo apt-get update && sudo apt-get upgrade -y
+\`\`\`
+
+### Step 2: Configuration Tweaks
+
+* Enable hardware acceleration for high-throughput graphics and computation.
+* Configure background caching on NVMe storage for fast access speeds.
+
+---
+
+## Frequently Asked Questions
+
+### What are the main benefits of ${title}?
+${title} provides enhanced performance, streamlined user interface controls, and updated security protocols.
+
+### How do I troubleshoot startup errors?
+Verify that system software updates are current, clear cached temporary files, and restart the application background process.
+
+### Is there support for automated workflows?
+Yes, robust API endpoints and command-line interfaces allow easy integration into automated task scripts.`;
+}
+
