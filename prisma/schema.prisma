@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,7 +12,7 @@ model User {
   name         String
   email        String   @unique
   passwordHash String
-  role         String   @default("ADMIN") // ADMIN, EDITOR, WRITER
+  role         String   @default("ADMIN")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   logs         Log[]
@@ -72,7 +72,7 @@ model Article {
   ogDescription        String?
   ogImage              String?
   indexFollow          String        @default("index, follow")
-  status               String        @default("DRAFT") // DRAFT, PENDING_REVIEW, SCHEDULED, PUBLISHED, ARCHIVED
+  status               String        @default("DRAFT")
   articleType          String        @default("Informational")
   
   primaryCategoryId    String
@@ -107,18 +107,18 @@ model Article {
 }
 
 model Keyword {
-  id                String        @id @default(uuid())
-  keyword           String        @unique
+  id                String    @id @default(uuid())
+  keyword           String    @unique
   primaryKeyword    String?
   secondaryKeywords String?
   categoryId        String?
-  category          Category?     @relation(fields: [categoryId], references: [id])
-  country           String        @default("US")
-  language          String        @default("en")
+  category          Category? @relation(fields: [categoryId], references: [id])
+  country           String    @default("US")
+  language          String    @default("en")
   searchIntent      String?
-  status            String        @default("UNUSED") // UNUSED, QUEUED, GENERATED, PUBLISHED, REJECTED
+  status            String    @default("UNUSED")
   articleId         String?
-  dateAdded         DateTime      @default(now())
+  dateAdded         DateTime  @default(now())
   dateGenerated     DateTime?
   datePublished     DateTime?
 }
@@ -149,24 +149,24 @@ model PromptTemplate {
 }
 
 model GenerationJob {
-  id              String    @id @default(uuid())
+  id              String   @id @default(uuid())
   keyword         String
   categoryId      String?
-  articleType     String    @default("Informational")
-  targetCountry   String    @default("US")
-  language        String    @default("en")
-  tone            String    @default("Professional & Authoritative")
-  minWords        Int       @default(1200)
-  maxWords        Int       @default(2500)
-  publishMode     String    @default("Draft")
-  status          String    @default("PENDING") // PENDING, RESEARCHING, GENERATING_OUTLINE, GENERATING_ARTICLE, REFINING, GENERATING_IMAGE, READY, SCHEDULED, PUBLISHED, FAILED
-  currentStage    String    @default("Queued")
-  progressPercent Int       @default(0)
+  articleType     String   @default("Informational")
+  targetCountry   String   @default("US")
+  language        String   @default("en")
+  tone            String   @default("Professional & Authoritative")
+  minWords        Int      @default(1200)
+  maxWords        Int      @default(2500)
+  publishMode     String   @default("Draft")
+  status          String   @default("PENDING")
+  currentStage    String   @default("Queued")
+  progressPercent Int      @default(0)
   articleId       String?
   errorMessage    String?
   logs            String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model ScheduledPost {
@@ -184,7 +184,7 @@ model InternalLink {
   targetArticleId String
   targetArticle   Article    @relation("TargetArticle", fields: [targetArticleId], references: [id], onDelete: Cascade)
   anchorText      String
-  status          String     @default("PENDING") // PENDING, APPROVED, REJECTED, APPLIED
+  status          String     @default("PENDING")
   createdAt       DateTime   @default(now())
 }
 
@@ -206,28 +206,28 @@ model AISetting {
 }
 
 model SiteSetting {
-  id                   String   @id @default("default")
-  siteName             String   @default("TechPulse")
-  logoUrl              String?
-  faviconUrl           String?
-  siteDescription      String   @default("The latest breaking technology news, expert software reviews, and in-depth how-to guides.")
-  defaultLang          String   @default("en")
-  defaultCountry       String   @default("US")
-  timezone             String   @default("UTC")
-  postsPerPage         Int      @default(12)
-  socialLinks          String?  // JSON string
-  contactEmail         String   @default("contact@techpulse.io")
-  footerText           String   @default("© 2026 TechPulse Media. All rights reserved.")
-  homepageSectionsJson String?  // Configurable sections
-  adPlacementsJson     String?  // Configurable ads
-  autoPublishEnabled   Boolean  @default(true)
-  autoPublishPostsPerDay Int    @default(3)
-  autoPublishMinInterval Int    @default(120) // in minutes
-  autoPublishMaxInterval Int    @default(360)
-  autoPublishStartHour   Int    @default(9)
-  autoPublishEndHour     Int    @default(21)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                     String   @id @default("default")
+  siteName               String   @default("TechPulse")
+  logoUrl                String?
+  faviconUrl             String?
+  siteDescription        String   @default("The latest breaking technology news, expert software reviews, and in-depth how-to guides.")
+  defaultLang            String   @default("en")
+  defaultCountry         String   @default("US")
+  timezone               String   @default("UTC")
+  postsPerPage           Int      @default(12)
+  socialLinks            String?
+  contactEmail           String   @default("contact@techpulse.io")
+  footerText             String   @default("© 2026 TechPulse Media. All rights reserved.")
+  homepageSectionsJson   String?
+  adPlacementsJson       String?
+  autoPublishEnabled     Boolean  @default(true)
+  autoPublishPostsPerDay Int      @default(3)
+  autoPublishMinInterval Int      @default(120)
+  autoPublishMaxInterval Int      @default(360)
+  autoPublishStartHour   Int      @default(9)
+  autoPublishEndHour     Int      @default(21)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 model Log {
