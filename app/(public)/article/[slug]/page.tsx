@@ -197,6 +197,11 @@ function formatMarkdownToHTML(markdown: string): string {
   for (let line of lines) {
     const trimmed = line.trim();
 
+    // Filter out raw ASCII box drawing characters if any model generates them
+    if (/^[┌├└│]/.test(trimmed)) {
+      continue;
+    }
+
     // Code blocks
     if (trimmed.startsWith('```')) {
       if (inCode) {

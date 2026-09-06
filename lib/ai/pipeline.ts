@@ -98,14 +98,15 @@ Return JSON format:
 
 ${customOutlineFormatted ? `STRICTLY FOLLOW THIS UNIQUE CUSTOM OUTLINE GENERATED FOR "${keyword}":\n${customOutlineFormatted}` : `Generate 5 to 7 unique, highly specific H2 headings and H3 subheadings for "${keyword}". DO NOT use generic template headings.`}
 
-CRITICAL RULES FOR DYNAMIC UNIQUE CONTENT & PATTERN:
-1. Every section title (H2 and H3) MUST be customized and unique to "${keyword}". NEVER reuse generic identical heading names across different articles.
-2. Structure: Include intro narrative, a detailed Markdown comparison table (| Spec / Metric | Value |), step-by-step practical setup instructions, and troubleshooting.
-3. CRITICAL FAQ RULE: In the "Frequently Asked Questions" H2 section, EVERY single FAQ answer MUST be a concise 1-line sentence (maximum 20 to 25 words). DO NOT write long paragraphs under FAQ questions. Example:
+CRITICAL RULES FOR MODERN ENGAGING CONTENT & PATTERN:
+1. TONE & STYLE (MODERN CONSUMER TECH MAGAZINE): Write in a crisp, engaging, reader-friendly style (like The Verge, Tom's Hardware, MKBHD, or Engadget). AVOID dry academic corporate jargon (e.g. "Navigating the modern hardware landscape", "deploying an enterprise fleet via HP Wolf Security"). Write directly to real buyers and tech enthusiasts looking for clear reviews, performance tests, and setup advice.
+2. UP-TO-DATE 2026 HARDWARE CONTEXT: Always reference current 2026/2025 hardware standards (e.g. Intel Core Ultra Series 2 Lunar Lake, AMD Ryzen AI 300, Snapdragon X Elite/Plus, OLED 120Hz displays, Wi-Fi 7). DO NOT reference obsolete or out-of-date processors.
+3. NO ASCII ART BOXES: DO NOT generate ASCII art boxes or text diagrams (like ┌──┐, ├──┤, or +--+ boxes). Use standard Markdown tables ONLY (| Spec / Metric | Details |).
+4. CRITICAL FAQ RULE: In the "Frequently Asked Questions" H2 section, EVERY single FAQ answer MUST be a concise 1-line sentence (maximum 20 to 25 words). DO NOT write long paragraphs under FAQ questions. Example:
    ### What is the battery life of Airbuds Pro?
    Airbuds Pro deliver up to 8 hours of continuous audio playback on a single charge with ANC enabled.
-4. Pattern & Tone: Adapt tone specifically to "${keyword}". If it's a hardware/product keyword, focus on hands-on review, specs, and battery/performance telemetry. If it's software/coding, focus on code blocks, commands, and workflow steps.
-5. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide". Write directly with authority and short, readable paragraphs.`;
+5. EVERY heading (H2 and H3) MUST be customized and unique to "${keyword}". NEVER reuse generic identical heading names across different articles.
+6. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide".`;
 
     const stage3Res = await provider.generateText(stage3Prompt);
     let rawContent = stage3Res.text;
