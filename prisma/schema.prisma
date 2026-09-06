@@ -1,0 +1,250 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("ADMIN") // ADMIN, EDITOR, WRITER
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  logs         Log[]
+}
+
+model Author {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  avatar    String?
+  bio       String?
+  expertise String?
+  twitter   String?
+  github    String?
+  linkedin  String?
+  website   String?
+  articles  Article[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  order       Int       @default(0)
+  enabled     Boolean   @default(true)
+  metaTitle   String?
+  metaDesc    String?
+  articles    Article[]
+  keywords    Keyword[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Tag {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  articles  Article[] @relation("ArticleToTag")
+  createdAt DateTime  @default(now())
+}
+
+model Article {
+  id                   String        @id @default(uuid())
+  title                String
+  slug                 String        @unique
+  subtitle             String?
+  excerpt              String?
+  content              String
+  seoTitle             String?
+  metaDescription      String?
+  canonicalUrl         String?
+  ogTitle              String?
+  ogDescription        String?
+  ogImage              String?
+  indexFollow          String        @default("index, follow")
+  status               String        @default("DRAFT") // DRAFT, PENDING_REVIEW, SCHEDULED, PUBLISHED, ARCHIVED
+  articleType          String        @default("Informational")
+  
+  primaryCategoryId    String
+  primaryCategory      Category      @relation(fields: [primaryCategoryId], references: [id])
+  tags                 Tag[]         @relation("ArticleToTag")
+  
+  authorId             String?
+  author               Author?       @relation(fields: [authorId], references: [id])
+  
+  featuredImage        String?
+  featuredImageAlt     String?
+  featuredImageCaption String?
+  
+  publishDate          DateTime?
+  scheduledDate        DateTime?
+  
+  isNews               Boolean       @default(false)
+  newsSource           String?
+  newsSourceUrl        String?
+  
+  searchIntent         String?
+  primaryKeyword       String?
+  secondaryKeywords    String?
+  readTimeMinutes      Int           @default(5)
+  viewCount            Int           @default(0)
+  
+  sourceLinks          InternalLink[] @relation("SourceArticle")
+  targetLinks          InternalLink[] @relation("TargetArticle")
+  
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+}
+
+model Keyword {
+  id                String        @id @default(uuid())
+  keyword           String        @unique
+  primaryKeyword    String?
+  secondaryKeywords String?
+  categoryId        String?
+  category          Category?     @relation(fields: [categoryId], references: [id])
+  country           String        @default("US")
+  language          String        @default("en")
+  searchIntent      String?
+  status            String        @default("UNUSED") // UNUSED, QUEUED, GENERATED, PUBLISHED, REJECTED
+  articleId         String?
+  dateAdded         DateTime      @default(now())
+  dateGenerated     DateTime?
+  datePublished     DateTime?
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  alt       String?
+  caption   String?
+  title     String?
+  width     Int      @default(1200)
+  height    Int      @default(675)
+  mimeType  String   @default("image/webp")
+  size      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model PromptTemplate {
+  id              String   @id @default(uuid())
+  key             String   @unique
+  name            String
+  description     String?
+  stage           String
+  template        String
+  defaultTemplate String
+  updatedAt       DateTime @updatedAt
+}
+
+model GenerationJob {
+  id              String    @id @default(uuid())
+  keyword         String
+  categoryId      String?
+  articleType     String    @default("Informational")
+  targetCountry   String    @default("US")
+  language        String    @default("en")
+  tone            String    @default("Professional & Authoritative")
+  minWords        Int       @default(1200)
+  maxWords        Int       @default(2500)
+  publishMode     String    @default("Draft")
+  status          String    @default("PENDING") // PENDING, RESEARCHING, GENERATING_OUTLINE, GENERATING_ARTICLE, REFINING, GENERATING_IMAGE, READY, SCHEDULED, PUBLISHED, FAILED
+  currentStage    String    @default("Queued")
+  progressPercent Int       @default(0)
+  articleId       String?
+  errorMessage    String?
+  logs            String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model ScheduledPost {
+  id           String   @id @default(uuid())
+  articleId    String
+  scheduledFor DateTime
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+}
+
+model InternalLink {
+  id              String     @id @default(uuid())
+  sourceArticleId String
+  sourceArticle   Article    @relation("SourceArticle", fields: [sourceArticleId], references: [id], onDelete: Cascade)
+  targetArticleId String
+  targetArticle   Article    @relation("TargetArticle", fields: [targetArticleId], references: [id], onDelete: Cascade)
+  anchorText      String
+  status          String     @default("PENDING") // PENDING, APPROVED, REJECTED, APPLIED
+  createdAt       DateTime   @default(now())
+}
+
+model AISetting {
+  id                String   @id @default("default")
+  provider          String   @default("fallback")
+  model             String   @default("gemini-1.5-flash")
+  apiKey            String?
+  temperature       Float    @default(0.7)
+  maxTokens         Int      @default(4000)
+  imageProvider     String   @default("fallback")
+  imageModel        String   @default("imagen-3")
+  imageApiKey       String?
+  dailyArticleLimit Int      @default(20)
+  dailyImageLimit   Int      @default(50)
+  monthlyBudget     Float    @default(100.0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SiteSetting {
+  id                   String   @id @default("default")
+  siteName             String   @default("TechPulse")
+  logoUrl              String?
+  faviconUrl           String?
+  siteDescription      String   @default("The latest breaking technology news, expert software reviews, and in-depth how-to guides.")
+  defaultLang          String   @default("en")
+  defaultCountry       String   @default("US")
+  timezone             String   @default("UTC")
+  postsPerPage         Int      @default(12)
+  socialLinks          String?  // JSON string
+  contactEmail         String   @default("contact@techpulse.io")
+  footerText           String   @default("© 2026 TechPulse Media. All rights reserved.")
+  homepageSectionsJson String?  // Configurable sections
+  adPlacementsJson     String?  // Configurable ads
+  autoPublishEnabled   Boolean  @default(true)
+  autoPublishPostsPerDay Int    @default(3)
+  autoPublishMinInterval Int    @default(120) // in minutes
+  autoPublishMaxInterval Int    @default(360)
+  autoPublishStartHour   Int    @default(9)
+  autoPublishEndHour     Int    @default(21)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Log {
+  id           String   @id @default(uuid())
+  timestamp    DateTime @default(now())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  userName     String?
+  action       String
+  keyword      String?
+  articleId    String?
+  provider     String?
+  model        String?
+  tokenUsage   Int?
+  costEstimate Float?
+  durationMs   Int?
+  status       String
+  message      String
+  detailsJson  String?
+}
