@@ -51,7 +51,7 @@ export class FallbackProvider implements AIProvider {
 
       return {
         text: JSON.stringify({
-          seoTitle: `${cleanKw}: Full Review, Specs & Performance Test (2026)`,
+          seoTitle: `${cleanKw} Review: Specs, Performance Test & Buyer Guide`,
           metaDescription: `Comprehensive in-depth review and technical breakdown of ${cleanKw}. Explore hardware specs, benchmarks, step-by-step optimization tips, and FAQs.`,
           slug: cleanKw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
           secondaryKeywords: ['specs', 'performance review', 'user guide', 'benchmarks', 'troubleshooting'],

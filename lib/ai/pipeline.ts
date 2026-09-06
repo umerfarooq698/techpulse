@@ -100,7 +100,7 @@ ${customOutlineFormatted ? `STRICTLY FOLLOW THIS UNIQUE CUSTOM OUTLINE GENERATED
 
 CRITICAL RULES FOR MODERN ENGAGING CONTENT & PATTERN:
 1. TONE & STYLE (MODERN CONSUMER TECH MAGAZINE): Write in a crisp, engaging, reader-friendly style (like The Verge, Tom's Hardware, MKBHD, or Engadget). AVOID dry academic corporate jargon (e.g. "Navigating the modern hardware landscape", "deploying an enterprise fleet via HP Wolf Security"). Write directly to real buyers and tech enthusiasts looking for clear reviews, performance tests, and setup advice.
-2. UP-TO-DATE 2026 HARDWARE CONTEXT: Always reference current 2026/2025 hardware standards (e.g. Intel Core Ultra Series 2 Lunar Lake, AMD Ryzen AI 300, Snapdragon X Elite/Plus, OLED 120Hz displays, Wi-Fi 7). DO NOT reference obsolete or out-of-date processors.
+2. TIMELESS EVERGREEN CONTENT (NO YEARS): DO NOT include year numbers (like 2026, 2025, 2024) in titles, headings, or body text. Keep all content timeless and evergreen.
 3. NO ASCII ART BOXES: DO NOT generate ASCII art boxes or text diagrams (like ┌──┐, ├──┤, or +--+ boxes). Use standard Markdown tables ONLY (| Spec / Metric | Details |).
 4. CRITICAL FAQ RULE: In the "Frequently Asked Questions" H2 section, EVERY single FAQ answer MUST be a concise 1-line sentence (maximum 20 to 25 words). DO NOT write long paragraphs under FAQ questions. Example:
    ### What is the battery life of Airbuds Pro?
@@ -118,11 +118,11 @@ CRITICAL RULES FOR MODERN ENGAGING CONTENT & PATTERN:
     // STAGE 5: SEO Metadata & Unique Title Generation
     await updateJob('Stage 5: Generating SEO Metadata & Schema Tags', 75);
     const stage5Prompt = `Generate a unique, high-CTR, engaging article title, subtitle, meta description, and URL slug specifically for the keyword: "${keyword}".
-DO NOT generate generic title like "${keyword}: Complete Guide & Setup".
+DO NOT include any year numbers (like 2026, 2025) in the title, subtitle, or meta description.
 Examples of top-tier catchy titles:
 - "Airbuds Pro Review: High-Res Audio & ANC Performance Tested"
 - "Docker Masterclass: How to Containerize Apps Like a Senior Developer"
-- "Nvidia RTX 5090 Tested: Is the 4K Ray Tracing Performance Real?"
+- "Nvidia RTX 5090 Tested: The New 4K Ray Tracing Benchmark King"
 
 Return JSON format:
 {
@@ -139,10 +139,15 @@ Return JSON format:
       seoData = {};
     }
 
-    const title = seoData.seoTitle || outlineData?.title || `${keyword.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: Full Review & Technical Breakdown`;
-    const subtitle = seoData.subtitle || `Comprehensive hands-on breakdown, benchmarks, setup guide, and FAQs for ${keyword}.`;
+    let title = seoData.seoTitle || outlineData?.title || `${keyword.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} Review & Full Technical Breakdown`;
+    title = stripYears(title);
+
+    let subtitle = seoData.subtitle || `Comprehensive hands-on breakdown, benchmarks, setup guide, and FAQs for ${keyword}.`;
+    subtitle = stripYears(subtitle);
+
     const slug = (seoData.slug || keyword).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const metaDescription = seoData.metaDescription || `In-depth technical breakdown and step-by-step guide for ${keyword}. Explore specs, performance benchmarks, and FAQs.`;
+    let metaDescription = seoData.metaDescription || `In-depth technical breakdown and step-by-step guide for ${keyword}. Explore specs, performance benchmarks, and FAQs.`;
+    metaDescription = stripYears(metaDescription);
 
     // STAGE 6: Image Generation
     await updateJob('Stage 6: Generating Unique Images', 85);
@@ -311,5 +316,21 @@ function cleanAntiAIPhrases(text: string): string {
     cleaned = cleaned.replace(regex, '');
   }
 
+  // Remove leading H1 title if generated inside markdown body to avoid double title
+  cleaned = cleaned.replace(/^#\s+[^\n]+\n+/, '');
+
+  // Strip year references from body text
+  cleaned = stripYears(cleaned);
+
   return cleaned;
+}
+
+function stripYears(text: string): string {
+  return text
+    .replace(/\s*\((202[4-9]|203[0-9])\s*Edition\)/gi, '')
+    .replace(/\s*\((202[4-9]|203[0-9])\)/gi, '')
+    .replace(/\s*in\s+(202[4-9]|203[0-9])/gi, '')
+    .replace(/\s*(202[4-9]|203[0-9])\s*Edition/gi, '')
+    .replace(/\b(202[4-9]|203[0-9])\b/g, '')
+    .replace(/\s{2,}/g, ' ');
 }
