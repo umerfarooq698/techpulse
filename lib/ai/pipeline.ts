@@ -56,54 +56,53 @@ Return JSON response format.`;
       analysisData = { searchIntent: config.searchIntent || 'Informational' };
     }
 
-    // STAGE 2: Outline Generation
+    // STAGE 2: Outline Generation (Tailored specifically for keyword)
     await updateJob('Stage 2: Generating Structured Article Outline', 25);
-    const stage2Prompt = `Create a detailed structured article outline for keyword "${keyword}".
-Article Type: ${config.articleType || 'Informational'}
-Target Audience: ${config.audience || 'Tech enthusiasts'}
-Include H2 headings, H3 subsections, tables, code examples, and FAQ section.
-Return JSON with sections array.`;
+    const stage2Prompt = `Generate a unique, highly custom, product/topic-tailored article outline for the keyword: "${keyword}".
+Do NOT use generic repetitive heading titles (like "Overview & Technical Context", "Key Features & Complete Specifications").
+Instead, create 5 to 7 specific, engaging, topic-focused H2 headings and H3 subheadings tailored exclusively to "${keyword}".
+
+Examples of keyword-tailored headings:
+- For "Samsung Galaxy S25": "Galaxy S25 Design Telemetry & Armor Framing", "Snapdragon 8 Elite Benchmark Scores", "Camera Array & ProVisual Engine", "One UI 7 Setup & Battery Tweaks", "Galaxy S25 FAQs"
+- For "Docker Tutorial": "Understanding Containers vs Virtual Machines", "Installing Docker Engine & Desktop", "Writing Efficient Dockerfiles", "Container Networking & Volume Mounting", "Docker Troubleshooting & FAQs"
+
+Return JSON format:
+{
+  "title": "Unique Catchy Title for ${keyword}",
+  "sections": [
+    { "heading": "Specific H2 Heading Title", "subheadings": ["H3 Subheading 1", "H3 Subheading 2"] }
+  ]
+}`;
     const stage2Res = await provider.generateText(stage2Prompt);
+    let outlineData: any = {};
+    try {
+      outlineData = JSON.parse(stage2Res.text.match(/\{[\s\S]*\}/)?.[0] || '{}');
+    } catch (e) {
+      outlineData = {};
+    }
 
-    // STAGE 3: Article Draft Writer
+    let customOutlineFormatted = '';
+    if (outlineData?.sections && Array.isArray(outlineData.sections)) {
+      customOutlineFormatted = outlineData.sections.map((sec: any) => {
+        let text = `## ${sec.heading}\n`;
+        if (sec.subheadings && Array.isArray(sec.subheadings)) {
+          text += sec.subheadings.map((sub: string) => `### ${sub}`).join('\n') + '\n';
+        }
+        return text;
+      }).join('\n');
+    }
+
+    // STAGE 3: Article Draft Writer using Custom Dynamic Outline
     await updateJob('Stage 3: Generating Article Content Section by Section', 45);
-    const stage3Prompt = `Write a comprehensive, top-tier, highly engaging article for the keyword: "${keyword}".
+    const stage3Prompt = `Write a comprehensive, top-tier, highly engaging, 1500+ word article specifically for the keyword: "${keyword}".
 
-TARGET PRODUCT & DOMAIN CONTEXT:
-- If "${keyword}" refers to consumer audio or hardware (e.g. Airbuds, Earbuds, Headphones, AirPods, Smartphones, Laptops, GPUs, Gadgets), write an authoritative, in-depth review & buyer setup guide covering sound quality, Active Noise Cancellation (ANC), technical specifications, real-world battery benchmarks, pairing/configuration steps, troubleshooting, and FAQs.
-- If "${keyword}" refers to software, coding, cloud, or cybersecurity, write a comprehensive step-by-step technical guide with code snippets, architecture breakdown, setup commands, performance metrics, and FAQs.
+${customOutlineFormatted ? `STRICTLY FOLLOW THIS UNIQUE CUSTOM OUTLINE GENERATED FOR "${keyword}":\n${customOutlineFormatted}` : `Generate 5 to 7 unique, highly specific H2 headings and H3 subheadings for "${keyword}". DO NOT use generic template headings.`}
 
-REQUIRED STRUCTURE (MUST USE CLEAR MARKDOWN HEADINGS & TABLES):
-## Overview & Technical Context
-Write a compelling intro explaining what ${keyword} is, its key positioning, and target audience.
-
-## Key Features & Complete Specifications
-Include a structured Markdown table comparing key specs and performance telemetry:
-| Feature / Specification | Details & Benchmark Metrics |
-| :--- | :--- |
-
-## Real-World Performance & Testing Metrics
-Detail hands-on performance, benchmarks, battery endurance, or execution efficiency.
-
-## Step-by-Step Practical Setup & Configuration Guide
-### Step 1: Initial Unboxing & Bluetooth Pairing / Setup
-### Step 2: Settings Optimization & Feature Customization
-
-## Troubleshooting Common Issues
-### Issue 1: Common Problem & Detailed Resolution
-
-## Frequently Asked Questions (FAQs)
-### What are the main features of ${keyword}?
-Provide a direct, detailed answer.
-### How does ${keyword} compare to previous generations?
-Provide a direct, detailed answer.
-### How to troubleshoot setup or connectivity issues?
-Provide a direct, detailed answer.
-
-CRITICAL CONTENT QUALITY RULES:
-1. Every paragraph and section MUST be 100% specifically relevant to "${keyword}".
-2. Use Markdown tables, bold highlights, bullet lists, and clear H2 and H3 headings.
-3. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide".`;
+CRITICAL RULES FOR DYNAMIC UNIQUE CONTENT & PATTERN:
+1. Every section title (H2 and H3) MUST be customized and unique to "${keyword}". NEVER reuse generic identical heading names across different articles.
+2. Structure: Include intro narrative, a detailed Markdown comparison table (| Spec / Metric | Value |), step-by-step practical setup instructions, troubleshooting, and a dedicated H2 "Frequently Asked Questions" section with 3 to 4 H3 question headings specifically about "${keyword}".
+3. Pattern & Tone: Adapt tone specifically to "${keyword}". If it's a hardware/product keyword, focus on hands-on review, specs, and battery/performance telemetry. If it's software/coding, focus on code blocks, commands, and workflow steps.
+4. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide". Write directly with authority and short, readable paragraphs.`;
 
     const stage3Res = await provider.generateText(stage3Prompt);
     let rawContent = stage3Res.text;
