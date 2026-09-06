@@ -67,20 +67,22 @@ Return JSON with sections array.`;
 
     // STAGE 3: Article Draft Writer
     await updateJob('Stage 3: Generating Article Content Section by Section', 45);
-    const stage3Prompt = `Write a comprehensive, professional technical article for keyword: "${keyword}".
+    const stage3Prompt = `Write a comprehensive, highly detailed technical and informational article specifically about: "${keyword}".
 Article Type: ${config.articleType || 'Informational'}
 Tone: ${config.tone || 'Professional & Authoritative'}
 Target Word Count: ${config.minWords || 1200} to ${config.maxWords || 2500} words.
-Format: Clean Markdown with H2, H3, bold text, technical code blocks (if applicable), practical tables, and bullet points.
+Format: Clean Markdown with H2, H3, bold text, technical code blocks or specs tables (where applicable), step-by-step instructions, and bullet points.
 
-CRITICAL CONTENT QUALITY RULES:
-1. NEVER use cliché AI filler phrases like:
-   - "In today's digital world"
-   - "In this comprehensive guide"
-   - "Whether you're a beginner or expert"
-   - "As technology continues to evolve"
-2. Write directly with technical authority, practical steps, and short readable paragraphs.
-3. Include an FAQ section with H3 headings at the end.`;
+CRITICAL CONTENT QUALITY & RELEVANCE RULES:
+1. Focus 100% specifically on "${keyword}". Every heading, paragraph, table, and FAQ MUST be directly relevant to "${keyword}".
+2. Structure the article with clear H2 sections:
+   - Overview & Technical Context of ${keyword}
+   - Key Features / Specifications / Architectural Breakdown of ${keyword}
+   - Real-World Performance & Benchmarks (include Markdown comparison/metrics table)
+   - Step-by-Step Practical Guide / Configuration / Setup Steps for ${keyword}
+   - Troubleshooting Common Issues for ${keyword}
+   - Frequently Asked Questions (H2 FAQ section with H3 questions)
+3. NEVER use cliché AI filler phrases like "In today's digital world", "In this comprehensive guide", "Whether you're a beginner or expert". Write directly with authority and specific technical details.`;
 
     const stage3Res = await provider.generateText(stage3Prompt);
     let rawContent = stage3Res.text;
