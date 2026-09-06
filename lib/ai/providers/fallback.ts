@@ -90,8 +90,11 @@ export class FallbackProvider implements AIProvider {
   }
 }
 
-function detectTopicType(keyword: string): 'smartphone' | 'laptop' | 'gpu' | 'ai' | 'security' | 'coding' | 'cloud' | 'gadget' | 'general' {
+function detectTopicType(keyword: string): 'smartphone' | 'laptop' | 'gpu' | 'ai' | 'security' | 'coding' | 'cloud' | 'gadget' | 'audio' | 'general' {
   const kw = keyword.toLowerCase();
+  if (kw.includes('airbud') || kw.includes('earbud') || kw.includes('headphone') || kw.includes('airpod') || kw.includes('audio') || kw.includes('earphone') || kw.includes('sound') || kw.includes('tws')) {
+    return 'audio';
+  }
   if (kw.includes('samsung') || kw.includes('galaxy') || kw.includes('iphone') || kw.includes('pixel') || kw.includes('phone') || kw.includes('mobile') || kw.includes('ultra') || kw.includes('pro max')) {
     return 'smartphone';
   }
@@ -120,6 +123,74 @@ function detectTopicType(keyword: string): 'smartphone' | 'laptop' | 'gpu' | 'ai
 }
 
 function generateRichTechnicalArticle(title: string, topic: string): string {
+  if (topic === 'audio') {
+    return `## Overview & Technical Context
+
+The wireless audio space is defined by advancements in active noise cancellation (ANC), high-resolution Bluetooth codecs, battery efficiency, and ergonomic acoustic design. Evaluating **${title}** demonstrates how modern TWS (True Wireless Stereo) drivers and digital signal processing (DSP) deliver immersive sound quality and clear voice isolation.
+
+In this technical review, we evaluate acoustic frequency response, Active Noise Cancellation depth (in dB), latency performance, battery endurance, and step-by-step pairing instructions.
+
+---
+
+## Driver Architecture & Acoustic Telemetry
+
+**${title}** incorporates custom dynamic drivers paired with dual exterior noise-detecting microphones and acoustic vents for pressure equalization.
+
+### Primary Acoustic Telemetry
+
+* **Driver Type**: Custom high-excursion dynamic drivers with composite diaphragms.
+* **Bluetooth & Codecs**: Bluetooth 5.3 / 5.4 supporting AAC, SBC, and LDAC / aptX Adaptive.
+* **Active Noise Cancellation (ANC)**: Hybrid feedforward + feedback ANC up to -45 dB attenuation.
+
+---
+
+## Audio Performance & Battery Benchmarks
+
+| Feature / Metric | ${title} | Previous Generation | Class Competitor |
+| :--- | :--- | :--- | :--- |
+| **ANC Attenuation** | -45 dB | -32 dB | -40 dB |
+| **Battery Life (Earbuds)** | 8 hours (ANC Off) | 6 hours | 7.5 hours |
+| **Total Playtime (with Case)** | 32 hours | 24 hours | 30 hours |
+| **Gaming Mode Latency** | 55 ms | 120 ms | 70 ms |
+| **Water Resistance** | IPX4 / IPX5 | IPX2 | IPX4 |
+
+---
+
+## Step-by-Step Pairing & Optimization Setup
+
+### Step 1: Initial Bluetooth Pairing
+
+1. Open the charging case lid while earbuds are placed inside.
+2. Press and hold the pairing button on the case for 3 seconds until the LED flashes white.
+3. On your smartphone or laptop, open **Settings > Bluetooth** and select **${title}**.
+
+### Step 2: Audio & EQ Customization
+
+1. Download the companion smartphone application.
+2. Select **Bass Boost** or **Balanced Natural EQ** profile based on preference.
+3. Enable **Low Latency Gaming Mode** for mobile gaming or video streaming.
+
+---
+
+## Troubleshooting Common Issues
+
+### Issue 1: One Earbud Not Syncing or Audio Dropping
+* **Fix**: Place both earbuds back inside the charging case, close lid for 10 seconds, then reopen and reconnect.
+
+---
+
+## Frequently Asked Questions
+
+### Are ${title} compatible with iOS and Android devices?
+Yes, they support universal Bluetooth connection across iPhone, Android, Windows, and macOS devices.
+
+### Do ${title} support active noise cancellation for calls?
+Yes, multi-microphone beamforming algorithms filter out environmental wind and background noise during calls.
+
+### Are ${title} suitable for workout and sports use?
+Yes, with sweat-resistant IPX4/IPX5 rating and ergonomic silicone ear tips, they stay secure during running and gym workouts.`;
+  }
+
   if (topic === 'smartphone') {
     return `## Overview & Technical Context
 

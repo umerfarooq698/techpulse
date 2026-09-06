@@ -62,6 +62,13 @@ const TOPIC_PHOTO_COLLECTION: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=1200&auto=format&fit=crop&q=80',
   ],
+  audio: [
+    'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=1200&auto=format&fit=crop&q=80',
+  ],
   gadgets: [
     'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&auto=format&fit=crop&q=80',
@@ -90,7 +97,9 @@ export async function generateArticleImages(
 
   let photoBucket = TOPIC_PHOTO_COLLECTION['defaultPool'];
 
-  if (kwLower.includes('samsung') || kwLower.includes('galaxy')) {
+  if (kwLower.includes('airbud') || kwLower.includes('earbud') || kwLower.includes('headphone') || kwLower.includes('airpod') || kwLower.includes('audio') || kwLower.includes('earphone') || kwLower.includes('tws') || kwLower.includes('buds') || kwLower.includes('speaker') || kwLower.includes('sound')) {
+    photoBucket = TOPIC_PHOTO_COLLECTION['audio'];
+  } else if (kwLower.includes('samsung') || kwLower.includes('galaxy')) {
     photoBucket = TOPIC_PHOTO_COLLECTION['samsung'];
   } else if (kwLower.includes('iphone') || kwLower.includes('apple') || kwLower.includes('ios')) {
     photoBucket = TOPIC_PHOTO_COLLECTION['iphone'];
