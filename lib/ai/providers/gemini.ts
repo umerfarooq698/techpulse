@@ -1,64 +1,80 @@
 import { AIProvider, AIGenerateOptions, AIGenerateResponse, ImageGenerateOptions, ImageGenerateResponse } from './base';
+import { FallbackProvider } from './fallback';
 
 export class GeminiProvider implements AIProvider {
   name = 'gemini';
+  private fallbackEngine = new FallbackProvider();
 
   async generateText(prompt: string, options: AIGenerateOptions = {}): Promise<AIGenerateResponse> {
     const apiKey = options.apiKey || process.env.GEMINI_API_KEY;
-    const model = options.model || 'gemini-1.5-flash';
+    const preferredModel = options.model && options.model !== 'default-model' ? options.model : 'gemini-3-flash-preview';
 
     if (!apiKey) {
-      throw new Error('Gemini API key is not configured');
+      console.warn('Gemini API key not found, using multi-topic fallback engine');
+      return this.fallbackEngine.generateText(prompt, options);
     }
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const candidateModels = Array.from(new Set([
+      preferredModel,
+      'gemini-3-flash-preview',
+      'gemini-flash-latest',
+      'gemini-3.1-flash-lite-preview',
+      'gemini-flash-lite-latest',
+      'gemma-4-31b-it',
+      'gemini-1.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-pro'
+    ]));
 
-    const contents = [];
-    if (options.systemPrompt) {
-      contents.push({ role: 'user', parts: [{ text: `System Instruction: ${options.systemPrompt}` }] });
-      contents.push({ role: 'model', parts: [{ text: 'Understood.' }] });
+    for (const model of candidateModels) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+        const contents = [];
+        if (options.systemPrompt) {
+          contents.push({ role: 'user', parts: [{ text: `System Instruction: ${options.systemPrompt}` }] });
+          contents.push({ role: 'model', parts: [{ text: 'Understood.' }] });
+        }
+        contents.push({ role: 'user', parts: [{ text: prompt }] });
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents,
+            generationConfig: {
+              temperature: options.temperature ?? 0.7,
+              maxOutputTokens: options.maxTokens ?? 4000,
+            },
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (generatedText.trim().length > 0) {
+            const totalTokens = data.usageMetadata?.totalTokenCount || 0;
+            return {
+              text: generatedText,
+              tokenUsage: {
+                promptTokens: data.usageMetadata?.promptTokenCount || 0,
+                completionTokens: data.usageMetadata?.candidatesTokenCount || 0,
+                totalTokens,
+              },
+            };
+          }
+        }
+      } catch (err) {
+        console.warn(`Gemini API call failed for model ${model}:`, err);
+      }
     }
-    contents.push({ role: 'user', parts: [{ text: prompt }] });
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents,
-        generationConfig: {
-          temperature: options.temperature ?? 0.7,
-          maxOutputTokens: options.maxTokens ?? 4000,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errorText}`);
-    }
-
-    const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const totalTokens = data.usageMetadata?.totalTokenCount || 0;
-
-    return {
-      text: generatedText,
-      tokenUsage: {
-        promptTokens: data.usageMetadata?.promptTokenCount || 0,
-        completionTokens: data.usageMetadata?.candidatesTokenCount || 0,
-        totalTokens,
-      },
-    };
+    console.warn('All Gemini API endpoints failed or returned empty text. Using rich multi-topic engine fallback.');
+    return this.fallbackEngine.generateText(prompt, options);
   }
 
   async generateImage(prompt: string, options: ImageGenerateOptions = {}): Promise<ImageGenerateResponse> {
-    // Standard image generation payload fallback or Imagen endpoint
-    return {
-      url: `/uploads/tech_${Date.now()}.webp`,
-      alt: prompt.slice(0, 100),
-      caption: `Editorial visual representation of ${prompt.slice(0, 80)}`,
-      width: 1200,
-      height: 675,
-    };
+    return this.fallbackEngine.generateImage(prompt, options);
   }
 }
+
