@@ -100,9 +100,12 @@ ${customOutlineFormatted ? `STRICTLY FOLLOW THIS UNIQUE CUSTOM OUTLINE GENERATED
 
 CRITICAL RULES FOR DYNAMIC UNIQUE CONTENT & PATTERN:
 1. Every section title (H2 and H3) MUST be customized and unique to "${keyword}". NEVER reuse generic identical heading names across different articles.
-2. Structure: Include intro narrative, a detailed Markdown comparison table (| Spec / Metric | Value |), step-by-step practical setup instructions, troubleshooting, and a dedicated H2 "Frequently Asked Questions" section with 3 to 4 H3 question headings specifically about "${keyword}".
-3. Pattern & Tone: Adapt tone specifically to "${keyword}". If it's a hardware/product keyword, focus on hands-on review, specs, and battery/performance telemetry. If it's software/coding, focus on code blocks, commands, and workflow steps.
-4. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide". Write directly with authority and short, readable paragraphs.`;
+2. Structure: Include intro narrative, a detailed Markdown comparison table (| Spec / Metric | Value |), step-by-step practical setup instructions, and troubleshooting.
+3. CRITICAL FAQ RULE: In the "Frequently Asked Questions" H2 section, EVERY single FAQ answer MUST be a concise 1-line sentence (maximum 20 to 25 words). DO NOT write long paragraphs under FAQ questions. Example:
+   ### What is the battery life of Airbuds Pro?
+   Airbuds Pro deliver up to 8 hours of continuous audio playback on a single charge with ANC enabled.
+4. Pattern & Tone: Adapt tone specifically to "${keyword}". If it's a hardware/product keyword, focus on hands-on review, specs, and battery/performance telemetry. If it's software/coding, focus on code blocks, commands, and workflow steps.
+5. NEVER use generic AI intro filler phrases like "In today's digital world" or "In this comprehensive guide". Write directly with authority and short, readable paragraphs.`;
 
     const stage3Res = await provider.generateText(stage3Prompt);
     let rawContent = stage3Res.text;
@@ -111,10 +114,22 @@ CRITICAL RULES FOR DYNAMIC UNIQUE CONTENT & PATTERN:
     await updateJob('Stage 4: Content Refinement & Anti-AI Filter Pass', 65);
     rawContent = cleanAntiAIPhrases(rawContent);
 
-    // STAGE 5: SEO Metadata Generation
+    // STAGE 5: SEO Metadata & Unique Title Generation
     await updateJob('Stage 5: Generating SEO Metadata & Schema Tags', 75);
-    const stage5Prompt = `Generate SEO Title, Meta Description, URL Slug, and primary/secondary keywords for article about keyword: "${keyword}".
-Return JSON format.`;
+    const stage5Prompt = `Generate a unique, high-CTR, engaging article title, subtitle, meta description, and URL slug specifically for the keyword: "${keyword}".
+DO NOT generate generic title like "${keyword}: Complete Guide & Setup".
+Examples of top-tier catchy titles:
+- "Airbuds Pro Review: High-Res Audio & ANC Performance Tested"
+- "Docker Masterclass: How to Containerize Apps Like a Senior Developer"
+- "Nvidia RTX 5090 Tested: Is the 4K Ray Tracing Performance Real?"
+
+Return JSON format:
+{
+  "seoTitle": "Unique Catchy Headline Title Here",
+  "subtitle": "Single-line informative subtitle describing key value.",
+  "metaDescription": "Concise 150-character SEO description summarizing key highlights.",
+  "slug": "url-friendly-slug-here"
+}`;
     const stage5Res = await provider.generateText(stage5Prompt);
     let seoData: any = {};
     try {
@@ -123,9 +138,10 @@ Return JSON format.`;
       seoData = {};
     }
 
-    const title = seoData.seoTitle || `${keyword.charAt(0).toUpperCase() + keyword.slice(1)}: Complete Guide & Setup`;
-    const slug = seoData.slug || keyword.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const metaDescription = seoData.metaDescription || `In-depth technical breakdown and setup steps for ${keyword}.`;
+    const title = seoData.seoTitle || outlineData?.title || `${keyword.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}: Full Review & Technical Breakdown`;
+    const subtitle = seoData.subtitle || `Comprehensive hands-on breakdown, benchmarks, setup guide, and FAQs for ${keyword}.`;
+    const slug = (seoData.slug || keyword).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const metaDescription = seoData.metaDescription || `In-depth technical breakdown and step-by-step guide for ${keyword}. Explore specs, performance benchmarks, and FAQs.`;
 
     // STAGE 6: Image Generation
     await updateJob('Stage 6: Generating Unique Images', 85);
