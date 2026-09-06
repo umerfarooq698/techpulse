@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Loader2, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, CheckCircle2, ArrowRight, Eye } from 'lucide-react';
 
 export default function AIGeneratorPage() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function AIGeneratorPage() {
     generateSupportingImages: true,
     autoInternalLinking: true,
     autoSEOMetadata: true,
-    publishingMode: 'Draft',
+    publishingMode: 'Publish Immediately',
   });
 
   useEffect(() => {
@@ -93,22 +93,32 @@ export default function AIGeneratorPage() {
       </div>
 
       {successData && (
-        <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+        <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
             <div>
-              <h4 className="font-bold text-emerald-900">Article Successfully Generated!</h4>
+              <h4 className="font-bold text-emerald-900">Article Successfully Generated & Published Live!</h4>
               <p className="text-xs text-emerald-700 mt-0.5">
-                Saved into database with 8-stage refinement pass, SEO metadata, and WebP graphics.
+                Article is now published live on the homepage and category sections.
               </p>
             </div>
           </div>
-          <button
-            onClick={() => router.push(`/admin/articles/${successData.articleId}`)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
-          >
-            Open in Article Editor <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href={`/article/${successData.slug}`}
+              target="_blank"
+              rel="noreferrer"
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+            >
+              <Eye className="w-3.5 h-3.5" /> View Public Page
+            </a>
+            <button
+              onClick={() => router.push(`/admin/articles/${successData.articleId}`)}
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+            >
+              Edit in CMS <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -180,10 +190,10 @@ export default function AIGeneratorPage() {
               name="publishingMode"
               value={form.publishingMode}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium bg-white"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-900 border-emerald-300"
             >
-              <option value="Draft">Draft</option>
               <option value="Publish Immediately">Publish Immediately</option>
+              <option value="Draft">Draft</option>
               <option value="Schedule">Schedule</option>
             </select>
           </div>
@@ -317,7 +327,7 @@ export default function AIGeneratorPage() {
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>Generate Article</span>
+                <span>Generate & Publish Article</span>
               </>
             )}
           </button>

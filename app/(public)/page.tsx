@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { db } from '@/lib/db';
 import { Sparkles, Clock, ArrowRight, TrendingUp, Shield, Cpu, Flame } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function PublicHomepage() {
@@ -14,7 +15,6 @@ export default async function PublicHomepage() {
 
   const featured = articles[0];
   const secondaryFeatured = articles.slice(1, 4);
-  const latestStories = articles.slice(4);
 
   const categories = await db.category.findMany({
     where: { enabled: true },
